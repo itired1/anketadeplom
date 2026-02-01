@@ -111,15 +111,26 @@ body {
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
+    object-position: center;
+    display: block;
     border: 3px solid transparent;
     background: linear-gradient(45deg, var(--color-primary), var(--color-secondary)) border-box;
-    -webkit-mask: 
-        linear-gradient(#fff 0 0) padding-box, 
-        linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+    background-clip: border-box;
     animation: pulse 2s infinite alternate;
     box-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
+    margin: 0 auto;
+}
+
+/* Fallback если изображение не загрузилось */
+.logo-image:not([src]),
+.logo-image[src=""] {
+    background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
 }
 
 .loader-text {
@@ -1647,5 +1658,26 @@ body {
     
     .preloader-container {
         padding: 1rem;
+    }
+}
+
+/* Исправление для очень маленьких экранов */
+@media (max-width: 320px) {
+    .logo-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .loader-text {
+        font-size: 1rem;
+    }
+    
+    .wave-line {
+        width: 4px;
+        height: 15px;
+    }
+    
+    .loading-tip {
+        font-size: 0.75rem;
     }
 }

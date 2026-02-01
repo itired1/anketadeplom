@@ -14,45 +14,99 @@ function initLoaderAnimation() {
     const preloader = document.querySelector('.preloader');
     const progressFill = document.querySelector('.progress-fill');
     const progressText = document.querySelector('.progress-text');
+    const logoImage = document.querySelector('.logo-image');
     
-    if (!preloader || !progressFill || !progressText) return;
+    if (!preloader) return;
     
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress > 100) progress = 100;
-        
-        progressFill.style.width = `${progress}%`;
-        progressText.textContent = `${Math.floor(progress)}%`;
-        
-        if (progress >= 100) {
-            clearInterval(interval);
+    // Проверяем загрузку изображения
+    if (logoImage) {
+        // Если изображение уже загружено
+        if (logoImage.complete) {
+            startLoaderAnimation();
+        } else {
+            // Ждем загрузки изображения
+            logoImage.onload = function() {
+                console.log('Логотип загружен успешно');
+                startLoaderAnimation();
+            };
             
-            // Ждем еще немного, чтобы показать 100%
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                preloader.style.visibility = 'hidden';
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                }, 500);
-            }, 500);
+            // Если произошла ошибка загрузки
+            logoImage.onerror = function() {
+                console.log('Ошибка загрузки логотипа, используем fallback');
+                // Используем fallback из inline стилей
+                logoImage.style.background = 'linear-gradient(45deg, #8a2be2, #ff1493)';
+                logoImage.style.display = 'flex';
+                logoImage.style.alignItems = 'center';
+                logoImage.style.justifyContent = 'center';
+                logoImage.style.color = 'white';
+                logoImage.style.fontWeight = 'bold';
+                logoImage.innerHTML = 'itiredmp3';
+                
+                startLoaderAnimation();
+            };
         }
-    }, 100);
-}
-
-window.addEventListener('load', function() {
-    const preloader = document.querySelector('.preloader');
+    } else {
+        startLoaderAnimation();
+    }
     
-    // Если лоадер все еще виден через 3 секунды, скрываем его принудительно
-    setTimeout(() => {
-        if (preloader && preloader.style.display !== 'none') {
+    function startLoaderAnimation() {
+        if (!progressFill || !progressText) {
+            // Если нет элементов прогресса, просто скрываем лоадер через 1.5 секунды
+            setTimeout(() => {
+                hidePreloader();
+            }, 1500);
+            return;
+        }
+        
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 100) progress = 100;
+            
+            if (progressFill) progressFill.style.width = `${progress}%`;
+            if (progressText) progressText.textContent = `${Math.floor(progress)}%`;
+            
+            if (progress >= 100) {
+                clearInterval(interval);
+                
+                // Ждем еще немного, чтобы показать 100%
+                setTimeout(() => {
+                    hidePreloader();
+                }, 500);
+            }
+        }, 100);
+    }
+    
+    function hidePreloader() {
+        if (preloader) {
             preloader.style.opacity = '0';
             preloader.style.visibility = 'hidden';
             setTimeout(() => {
                 preloader.style.display = 'none';
             }, 500);
         }
-    }, 3000);
+    }
+    
+    // Фолбэк: если лоадер все еще виден через 4 секунды, скрываем его принудительно
+    setTimeout(() => {
+        if (preloader && preloader.style.display !== 'none') {
+            hidePreloader();
+        }
+    }, 4000);
+}
+
+window.addEventListener('load', function() {
+    // Дополнительная проверка после полной загрузки страницы
+    const preloader = document.querySelector('.preloader');
+    if (preloader && preloader.style.display !== 'none') {
+        setTimeout(() => {
+            preloader.style.opacity = '0';
+            preloader.style.visibility = 'hidden';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        }, 500);
+    }
 });
 
 function initMobileMenu() {
