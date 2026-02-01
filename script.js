@@ -7,17 +7,52 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScroll();
     initScrollAnimations();
     initSurveyFormButton();
+    initLoaderAnimation();
 });
+
+function initLoaderAnimation() {
+    const preloader = document.querySelector('.preloader');
+    const progressFill = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+    
+    if (!preloader || !progressFill || !progressText) return;
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        progressFill.style.width = `${progress}%`;
+        progressText.textContent = `${Math.floor(progress)}%`;
+        
+        if (progress >= 100) {
+            clearInterval(interval);
+            
+            // Ждем еще немного, чтобы показать 100%
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 500);
+        }
+    }, 100);
+}
 
 window.addEventListener('load', function() {
     const preloader = document.querySelector('.preloader');
+    
+    // Если лоадер все еще виден через 3 секунды, скрываем его принудительно
     setTimeout(() => {
-        preloader.style.opacity = '0';
-        preloader.style.visibility = 'hidden';
-        setTimeout(() => {
-            preloader.style.display = 'none';
-        }, 500);
-    }, 1500);
+        if (preloader && preloader.style.display !== 'none') {
+            preloader.style.opacity = '0';
+            preloader.style.visibility = 'hidden';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        }
+    }, 3000);
 });
 
 function initMobileMenu() {
